@@ -1,2 +1,1 @@
-# atlas-app
-atlas app
+# README
