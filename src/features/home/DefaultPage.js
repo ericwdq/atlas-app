@@ -4,12 +4,16 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 // import { Link } from 'react-router-dom';
 import * as actions from './redux/actions';
-import { Layout, Breadcrumb, Spin, Alert, Form, Row, Col, Button, Select } from 'antd';
-import * as d3Selection from 'd3-selection';
+import { Layout, Breadcrumb, Spin, Alert, Form, Row, Col, Button, Select, DatePicker } from 'antd';
+import * as d3 from 'd3';
+// import moment from 'moment';
 // import PriceChart from './PriceChart';
+import InteractiveChart from './InteractiveChart';
 const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
 const Option = Select.Option;
+const { RangePicker } = DatePicker;
+
 export class DefaultPage extends Component {
   static propTypes = {
     home: PropTypes.object.isRequired,
@@ -18,6 +22,8 @@ export class DefaultPage extends Component {
 
   state = {
     initializing: true,
+    startDate: '2011-01-01',
+    endDate: '2018-03-31',
   };
 
   componentWillMount() {
@@ -36,17 +42,15 @@ export class DefaultPage extends Component {
   }
 
   handleD3Click = () => {
-    d3Selection.select('.app-title').html('changed from d3');
+    // d3Selection.select('.app-title').html('changed from d3');
   };
 
   handleSubmit = evt => {
     console.log(evt);
     evt.preventDefault();
-    d3Selection.select('.app-title').html('changed from d3');
-  };
-
-  drawChart = data => {
-    console.log(data);
+    d3.select('.app-title').html('changed from d3');
+    // d3.svg;
+    // d3Selection.select('.app-title').html('changed from d3');
   };
 
   renderInitializing() {
@@ -63,7 +67,10 @@ export class DefaultPage extends Component {
               <Breadcrumb.Item>Hackathon</Breadcrumb.Item>
               <Breadcrumb.Item>App</Breadcrumb.Item>
             </Breadcrumb>
-            <div className="app-conent" style={{ background: '#fff', padding: 24, minHeight: 600 }}>
+            <div
+              className="app-conent"
+              style={{ background: '#fff', padding: 24, minHeight: 'calc(100vh - 188px)' }}
+            >
               <Spin />
             </div>
           </Content>
@@ -101,7 +108,12 @@ export class DefaultPage extends Component {
     // };
 
     console.log(purchasePriceList);
-
+    const dateFormat = 'YYYY-MM-DD';
+    // [
+    //   moment('2017-03-31', dateFormat),
+    //   moment('2018-03-31', dateFormat),
+    // ]
+    // defaultValue={[new Date(), new Date()]}
     if (fetchPurchasePriceListPending || this.state.initializing) {
       return this.renderInitializing();
     }
@@ -139,7 +151,7 @@ export class DefaultPage extends Component {
                     </Col>
                     <Col span={8}>
                       <FormItem label="Purchasing strategy:">
-                        <Select defaultValue="lucy" onChange={() => {}}>
+                        <Select defaultValue="" onChange={() => {}}>
                           <Option value="op1">Option 1</Option>
                           <Option value="op2">Option 2</Option>
                           <Option value="disabled" disabled>
@@ -154,8 +166,15 @@ export class DefaultPage extends Component {
                       </Button>
                     </Col>
                   </Row>
+                  <Row gutter={24}>
+                    <Col span={16}>
+                      <FormItem label="Post Data Range:">
+                        <RangePicker />
+                      </FormItem>
+                    </Col>
+                  </Row>
+
                   <Row className="form-bottom-buttons-container">
-                    {' '}
                     <Col span="24" style={{ textAlign: 'right' }} />
                   </Row>
                 </Form>
@@ -170,7 +189,12 @@ export class DefaultPage extends Component {
                     <span className="line forecast" />
                     <label>Forecast Data</label>
                   </div>
-                  <div id="price-chart" style={{ padding: '0 24px' }} />
+                  <InteractiveChart
+                    data={[{ date: new Date(), value: 1234 }]}
+                    startDate={this.state.startDate}
+                    endDate={this.state.endDate}
+                    forecastedData={[{ date: new Date(), value: 4567 }]}
+                  />
                 </div>
               </fieldset>
             </div>
