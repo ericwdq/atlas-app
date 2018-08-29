@@ -2,17 +2,31 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import moment from 'moment';
 // import { Link } from 'react-router-dom';
 import * as actions from './redux/actions';
-import { Layout, Breadcrumb, Spin, Alert, Form, Row, Col, Button, Select, DatePicker } from 'antd';
-import * as d3 from 'd3';
-// import moment from 'moment';
-// import PriceChart from './PriceChart';
+import {
+  Layout,
+  Breadcrumb,
+  Spin,
+  Alert,
+  Form,
+  Row,
+  Col,
+  Button,
+  Select,
+  DatePicker,
+  Tabs,
+} from 'antd';
 import InteractiveChart from './InteractiveChart';
 const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
+const TabPane = Tabs.TabPane;
+const dateFormat = 'YYYY-MM-DD';
+const startDate = '2016-03-31';
+const endDate = '2017-03-31';
 
 export class DefaultPage extends Component {
   static propTypes = {
@@ -22,8 +36,11 @@ export class DefaultPage extends Component {
 
   state = {
     initializing: true,
-    startDate: '2011-01-01',
-    endDate: '2018-03-31',
+    forecasting: false,
+    startDate: startDate,
+    endDate: endDate,
+    timeSpan: null,
+    strategy: null,
   };
 
   componentWillMount() {
@@ -41,16 +58,49 @@ export class DefaultPage extends Component {
       });
   }
 
-  handleD3Click = () => {
-    // d3Selection.select('.app-title').html('changed from d3');
+  handleDateChange = (date, dateString) => {
+    console.log(date, dateString);
+    if (dateString[0] !== '') {
+      this.props.actions.cleanForecastData();
+      this.setState({
+        startDate: dateString[0],
+        endDate: dateString[1],
+      });
+    }
+  };
+
+  disabledDate = current => {
+    // Can not select days before today and today
+    return (
+      current &&
+      (current.toDate() < moment(startDate, dateFormat).toDate() ||
+        current.toDate() > moment(endDate, dateFormat).toDate())
+    );
   };
 
   handleSubmit = evt => {
-    console.log(evt);
     evt.preventDefault();
-    d3.select('.app-title').html('changed from d3');
-    // d3.svg;
-    // d3Selection.select('.app-title').html('changed from d3');
+    this.setState({
+      forecasting: true,
+    });
+    this.props.actions
+      .fetchForecastPriceList(
+        {},
+        this.state.timeSpan,
+        this.state.strategy,
+        this.state.startDate,
+        this.state.endDate,
+      )
+      .then(() => {
+        this.setState({
+          forecasting: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          forecasting: false,
+        });
+      });
   };
 
   renderInitializing() {
@@ -101,19 +151,13 @@ export class DefaultPage extends Component {
       fetchPurchasePriceListPending,
       fetchPurchasePriceListError,
       purchasePriceList,
+      fetchForecastPriceListError,
+      forecastPriceList,
     } = this.props.home;
-    // const formItemLayout = {
-    //   labelCol: { span: 6 },
-    //   wrapperCol: { span: 14 },
-    // };
 
-    console.log(purchasePriceList);
-    const dateFormat = 'YYYY-MM-DD';
-    // [
-    //   moment('2017-03-31', dateFormat),
-    //   moment('2018-03-31', dateFormat),
-    // ]
-    // defaultValue={[new Date(), new Date()]}
+    // console.log(purchasePriceList);
+    console.log(forecastPriceList);
+
     if (fetchPurchasePriceListPending || this.state.initializing) {
       return this.renderInitializing();
     }
@@ -129,7 +173,7 @@ export class DefaultPage extends Component {
           <Content style={{ padding: '0 50px', marginTop: 64 }}>
             <Breadcrumb style={{ margin: '16px 0', textAlign: 'left' }}>
               <Breadcrumb.Item>Hackathon</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
+              <Breadcrumb.Item>Atlas App</Breadcrumb.Item>
             </Breadcrumb>
             <div
               className="app-content"
@@ -150,8 +194,8 @@ export class DefaultPage extends Component {
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem label="Purchasing strategy:">
-                        <Select defaultValue="" onChange={() => {}}>
+                      <FormItem label="Purchasing Strategy:">
+                        <Select defaultValue="op1" onChange={() => {}}>
                           <Option value="op1">Option 1</Option>
                           <Option value="op2">Option 2</Option>
                           <Option value="disabled" disabled>
@@ -161,15 +205,45 @@ export class DefaultPage extends Component {
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <Button size="large" type="primary" htmlType="submit" loading={false}>
-                        {false ? 'Forecast...' : 'Forecast'}
+                      <Button
+                        size="large"
+                        type="primary"
+                        htmlType="submit"
+                        loading={this.state.forecasting}
+                      >
+                        {this.state.forecasting ? 'Forecast...' : 'Forecast'}
                       </Button>
                     </Col>
                   </Row>
                   <Row gutter={24}>
                     <Col span={16}>
                       <FormItem label="Post Data Range:">
-                        <RangePicker />
+                        <RangePicker
+                          onChange={this.handleDateChange}
+                          defaultValue={[
+                            moment(startDate, dateFormat),
+                            moment(endDate, dateFormat),
+                          ]}
+                          format={dateFormat}
+                          disabledDate={this.disabledDate}
+                          dateRender={current => {
+                            const style = {};
+                            console.log();
+                            // console.log(moment(, dateFormat).toDate());
+                            if (
+                              current.format(dateFormat) === startDate ||
+                              current.format(dateFormat) === endDate
+                            ) {
+                              style.border = '1px solid #1890ff';
+                              style.borderRadius = '50%';
+                            }
+                            return (
+                              <div className="ant-calendar-date" style={style}>
+                                {current.date()}
+                              </div>
+                            );
+                          }}
+                        />
                       </FormItem>
                     </Col>
                   </Row>
@@ -180,26 +254,36 @@ export class DefaultPage extends Component {
                 </Form>
               </fieldset>
               <fieldset style={{ margin: '10px 0 0 0' }}>
-                <legend>Purchasing Price Data</legend>
-                <div className="chart-container">
-                  {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
-                  <div className="chart-legend">
-                    <span className="line past" />
-                    <label>Past Data</label>
-                    <span className="line forecast" />
-                    <label>Forecast Data</label>
-                  </div>
-                  <InteractiveChart
-                    data={[{ date: new Date(), value: 1234 }]}
-                    startDate={this.state.startDate}
-                    endDate={this.state.endDate}
-                    forecastedData={[{ date: new Date(), value: 4567 }]}
-                  />
-                </div>
+                <legend>Intelligent Forecast</legend>
+                <Tabs defaultActiveKey="price">
+                  <TabPane tab=" Purchasing Price Forecast" key="price">
+                    <div className="chart-container">
+                      {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
+                      {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
+                      <div className="chart-legend">
+                        <span className="line past" />
+                        <label>Past Data</label>
+                        <span className="line forecast" />
+                        <label>Forecast Data</label>
+                      </div>
+                      <InteractiveChart
+                        data={purchasePriceList}
+                        startDate={this.state.startDate}
+                        endDate={this.state.endDate}
+                        forecastedData={forecastPriceList}
+                        forecasting={this.state.forecasting}
+                      />
+                      {this.state.forecasting && <Spin />}
+                    </div>
+                  </TabPane>
+                  <TabPane tab="Purchase Planning Suggestion" key="planning">
+                    Purchase Planning Suggestion content
+                  </TabPane>
+                </Tabs>
               </fieldset>
             </div>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>Atlas team @B1 Hackathon 2018 </Footer>
+          <Footer style={{ textAlign: 'center' }}>Atlas team #B1 Hackathon 2018# </Footer>
         </Layout>
       </div>
     );
