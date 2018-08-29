@@ -22,31 +22,28 @@ export class InteractiveChart extends Component {
   };
 
   componentWillMount() {
-    console.log('Chart mount');
     // d3.select('#price-chart')
     //   .style('color', 'red')
     //   .html('Chart will mount');
   }
 
   componentDidMount() {
-    console.log('Chart did mount');
     const { data = [], forecastedData = [], startDate, endDate } = this.props;
     this.drawLineChart(data, forecastedData, startDate, endDate);
   }
 
   componentDidUpdate() {
-    console.log('Chart did update');
     const { data = [], forecastedData = [], startDate, endDate } = this.props;
     this.drawLineChart(data, forecastedData, startDate, endDate);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.forecastedData.length > 0) {
-      console.log(nextProps.forecastedData);
-      const { data = [], startDate, endDate } = this.props;
-      this.drawLineChart(data, nextProps.forecastedData, startDate, endDate);
-      // this.props.history.replace(`/position/view/${positionId}`);
-    }
+    // if (nextProps.forecastedData.length > 0) {
+    //   console.log(nextProps.forecastedData);
+    //   const { data = [], startDate, endDate } = this.props;
+    //   this.drawLineChart(data, nextProps.forecastedData, startDate, endDate);
+    //   this.props.history.replace(`/position/view/${positionId}`);
+    // }
   }
 
   drawLineChart = (data, forecastedData, startDate, endDate) => {
@@ -58,7 +55,6 @@ export class InteractiveChart extends Component {
     data = data.filter(d => {
       return d.value !== 0 && d.date >= start && d.date <= end;
     });
-    // console.log('data', data);
     forecastedData = forecastedData.filter(d => d.value !== 0);
     let mergedData = [...data];
     if (forecastedData.length > 0) {
@@ -67,8 +63,6 @@ export class InteractiveChart extends Component {
       }
       mergedData = [...mergedData, ...forecastedData];
     }
-    // console.log('forecastedData', forecastedData);
-    // console.log('mergedData', mergedData);
     const svgNode = this.node;
     let svgWidth = window.innerWidth - 160 < 800 ? 800 : window.innerWidth - 160;
     // if (data.length > 365) {
@@ -167,11 +161,11 @@ export class InteractiveChart extends Component {
       .call(customYAxis)
       .append('text')
       .attr('fill', 'rgb(102, 102, 102, .85)')
-      .attr('transform', 'translate(32, -26)')
+      .attr('transform', 'translate(22, -26)')
       .attr('y', 7)
       .attr('dy', '0.71em')
       .attr('text-anchor', 'end')
-      .style('font', '14px sans-serif')
+      .style('font', '12px sans-serif')
       .text('Price (CNY)');
 
     g.append('path')
@@ -192,6 +186,16 @@ export class InteractiveChart extends Component {
         .attr('stroke-linecap', 'round')
         .attr('stroke-width', 2)
         .attr('d', line);
+      const splitLine = svg
+        .append('path')
+        .attr('class', 'split-line')
+        .attr('stroke', 'rgba(153, 153, 153, .45)')
+        .attr('stroke-dasharray', '3 3')
+        .attr('stroke-width', 1.5);
+
+      const lastDate = forecastedData[0].date;
+      const splitX = x(lastDate) + margin.left;
+      splitLine.attr('transform', `translate(0, 20)`).attr('d', `M${splitX},${height} ${splitX} 0`);
     }
 
     function customYAxis(g) {
@@ -200,7 +204,7 @@ export class InteractiveChart extends Component {
         .tickSize(width)
         .tickFormat(function(d) {
           // var s = formatNumber(d / 1e6);
-          return this.parentNode.nextSibling ? '\xa0' + d : '$' + d;
+          return this.parentNode.nextSibling ? '\xa0' + d : '¥' + d;
         });
       g.call(yAxis);
       g.select('.domain').remove();
@@ -259,11 +263,7 @@ export class InteractiveChart extends Component {
         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
       const posX = x(d.date) + margin.left;
       const posY = y(d.value) + margin.top;
-      markLine.attr('transform', `translate(0, 20)`).attr('d', () => {
-        var d = 'M' + posX + ',' + height;
-        d += ' ' + posX + ',' + 0;
-        return d;
-      });
+      markLine.attr('transform', `translate(0, 20)`).attr('d', `M${posX},${height} ${posX} 0`);
 
       dot.attr('transform', `translate(${posX}, ${posY})`);
       const tooltipX = posX + 150 > svgWidth ? posX - 100 : posX + 35;

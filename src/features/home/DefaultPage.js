@@ -155,9 +155,6 @@ export class DefaultPage extends Component {
       forecastPriceList,
     } = this.props.home;
 
-    // console.log(purchasePriceList);
-    console.log(forecastPriceList);
-
     if (fetchPurchasePriceListPending || this.state.initializing) {
       return this.renderInitializing();
     }
