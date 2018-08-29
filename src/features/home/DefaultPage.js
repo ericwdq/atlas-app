@@ -25,7 +25,7 @@ const Option = Select.Option;
 const { RangePicker } = DatePicker;
 const TabPane = Tabs.TabPane;
 const dateFormat = 'YYYY-MM-DD';
-const startDate = '2016-03-31';
+const startDate = '2011-01-01';
 const endDate = '2017-03-31';
 
 export class DefaultPage extends Component {
@@ -59,12 +59,17 @@ export class DefaultPage extends Component {
   }
 
   handleDateChange = (date, dateString) => {
-    console.log(date, dateString);
+    // console.log(date, dateString);
+    this.props.actions.cleanForecastData();
     if (dateString[0] !== '') {
-      this.props.actions.cleanForecastData();
       this.setState({
         startDate: dateString[0],
         endDate: dateString[1],
+      });
+    } else {
+      this.setState({
+        startDate,
+        endDate,
       });
     }
   };
@@ -214,12 +219,16 @@ export class DefaultPage extends Component {
                   </Row>
                   <Row gutter={24}>
                     <Col span={16}>
-                      <FormItem label="Post Data Range:">
+                      <FormItem label="Past Data Range:">
                         <RangePicker
                           onChange={this.handleDateChange}
                           defaultValue={[
                             moment(startDate, dateFormat),
                             moment(endDate, dateFormat),
+                          ]}
+                          value={[
+                            moment(this.state.startDate, dateFormat),
+                            moment(this.state.endDate, dateFormat),
                           ]}
                           format={dateFormat}
                           disabledDate={this.disabledDate}
@@ -273,8 +282,8 @@ export class DefaultPage extends Component {
                       {this.state.forecasting && <Spin />}
                     </div>
                   </TabPane>
-                  <TabPane tab="Purchase Planning Suggestion" key="planning">
-                    Purchase Planning Suggestion content
+                  <TabPane tab="Purchase Planning Recommendation" key="planning">
+                    Recommendation content
                   </TabPane>
                 </Tabs>
               </fieldset>
