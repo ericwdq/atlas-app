@@ -69,10 +69,10 @@ export class InteractiveChart extends Component {
     //   svgWidth = data.length * 5;
     // }
     let svgHeight =
-      parseInt(window.innerHeight - 500 / 2, 10) > 700
+      parseInt(window.innerHeight - 500 / 2, 10) >= 500
         ? 500
         : parseInt(window.innerHeight - 500 / 2, 10);
-    svgHeight = svgHeight < 300 ? 500 : svgHeight;
+    svgHeight = svgHeight < 400 ? 500 : svgHeight;
     // console.log(svgWidth);
     // console.log(svgHeight);
     const margin = { top: 20, right: 20, bottom: 80, left: 50 };
