@@ -11,8 +11,10 @@ const dateFormat = 'YYYYMMDD';
 
 function parseData(data) {
   return Object.entries(data).map(d => {
+    const date = moment(d[0], dateFormat);
+    const day = date.day();
     return {
-      x: moment(d[0], dateFormat).format('MM-DD'),
+      x: date.format('MM-DD'),
       y: +d[1].Recommend || 0,
     };
   });

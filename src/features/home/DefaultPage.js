@@ -461,7 +461,7 @@ export class DefaultPage extends Component {
                         </strong>
                         <div className="chart-legend">
                           <span className="line forecast" />
-                          <label>Recommendation Data</label>
+                          <label>Recommend Data</label>
                         </div>
                         <BarChart height={400} title="" data={recommendationList} />
                       </div>

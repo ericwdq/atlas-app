@@ -81,7 +81,7 @@ class Bar extends Component {
         value: y,
       }),
     ];
-
+    // autoHideXLabels ? false :
     return (
       <div className="bar-chart" style={{ height }} ref={this.handleRoot}>
         <div ref={this.handleRef}>
@@ -93,7 +93,7 @@ class Bar extends Component {
             data={data}
             padding={padding || 'auto'}
           >
-            <Axis name="x" title={false} label={false} tickLine={false} />
+            <Axis name="x" title={false} label={false} tickLine={autoHideXLabels ? false : {}} />
             <Axis name="y" min={0} />
             <Tooltip showTitle={false} crosshairs={false} />
             <Geom type="interval" position="x*y" color={color} tooltip={tooltip} />
