@@ -457,7 +457,8 @@ export class DefaultPage extends Component {
                     {recommendationList.length > 0 && (
                       <div className="chart-container recommend">
                         <strong>
-                          Here are the purchase decisions recommendation for next 3 months:{' '}
+                          Here are the purchase quantity recommendation of each days for next 3
+                          months:{' '}
                         </strong>
                         <div className="chart-legend">
                           <span className="line forecast" />
