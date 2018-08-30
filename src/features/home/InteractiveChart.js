@@ -61,8 +61,10 @@ export class InteractiveChart extends Component {
     data = data.filter(d => {
       return d[measure] !== 0 && d['date'] >= start && d['date'] <= end;
     });
-    console.log('data', data);
-    forecastedData = forecastedData.filter(d => d[measure] !== 0);
+    // console.log('data', data);
+    if (measure !== 'recommend') {
+      forecastedData = forecastedData.filter(d => d[measure] !== 0);
+    }
     let mergedData = [...data];
     if (forecastedData.length > 0) {
       if (data.length > 0) {

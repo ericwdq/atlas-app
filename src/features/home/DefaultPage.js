@@ -22,6 +22,7 @@ import {
   Checkbox,
 } from 'antd';
 import InteractiveChart from './InteractiveChart';
+import BarChart from './BarChart';
 const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -46,7 +47,7 @@ export class DefaultPage extends Component {
     dataRangeType: 'all',
     recommending: false,
     weekdays: ['0', '1', '2', '3', '4', '5', '6'],
-    confidence: 1,
+    confidence: 0.5,
     period: 7,
   };
 
@@ -120,7 +121,7 @@ export class DefaultPage extends Component {
       recommending: true,
     });
     this.props.actions
-      .fetchRecommendation({}, this.state.weekdays, this.state.period, this.state.confidence)
+      .fetchRecommendation({}, this.state.period, this.state.weekdays, this.state.confidence)
       .then(() => {
         this.setState({
           recommending: false,
@@ -166,14 +167,14 @@ export class DefaultPage extends Component {
     this.setState({
       period: value,
     });
-    console.log('checked = ', value);
+    // console.log('checked = ', value);
   };
 
   handleWeekdaysChange = checkedValues => {
     this.setState({
       weekdays: checkedValues,
     });
-    console.log('checked = ', checkedValues);
+    // console.log('checked = ', checkedValues);
   };
 
   handleConfidenceChange = value => {
@@ -235,7 +236,7 @@ export class DefaultPage extends Component {
       fetchRecommendationError,
       recommendationList,
     } = this.props.home;
-    console.log(recommendationList);
+    console.log('recommendationList', recommendationList);
     const weekdaysOptions = [
       { label: 'Mon', value: '1' },
       { label: 'Tue', value: '2' },
@@ -287,7 +288,6 @@ export class DefaultPage extends Component {
                           disabledDate={this.disabledDate}
                           dateRender={current => {
                             const style = {};
-                            console.log();
                             // console.log(moment(, dateFormat).toDate());
                             if (
                               current.format(dateFormat) === startDate ||
