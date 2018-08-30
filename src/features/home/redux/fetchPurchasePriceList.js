@@ -11,7 +11,6 @@ const dateFormat = 'YYYYMMDD';
 
 function parseData(data) {
   return Object.entries(data).map(d => {
-    // const date = [d[0].slice(0, 4), d[0].slice(4, 6), d[0].slice(6, 8)].join('-');
     return {
       date: moment(d[0], dateFormat).toDate(),
       price: +d[1].Price || 0,

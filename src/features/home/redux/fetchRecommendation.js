@@ -1,3 +1,5 @@
+import axios from 'axios';
+import moment from 'moment';
 import {
   HOME_FETCH_RECOMMENDATION_BEGIN,
   HOME_FETCH_RECOMMENDATION_SUCCESS,
@@ -5,10 +7,26 @@ import {
   HOME_FETCH_RECOMMENDATION_DISMISS_ERROR,
 } from './constants';
 
+const dateFormat = 'YYYYMMDD';
+
+function parseData(data) {
+  return Object.entries(data).map(d => {
+    return {
+      date: moment(d[0], dateFormat)
+        .add(1, 'years')
+        .toDate(),
+      price: +d[1].Price || 0,
+      quantity: +d[1].Quantity || 0,
+    };
+  });
+}
+
 // Rekit uses redux-thunk for async actions by default: https://github.com/gaearon/redux-thunk
 // If you prefer redux-saga, you can use rekit-plugin-redux-saga: https://github.com/supnate/rekit-plugin-redux-saga
-export function fetchRecommendation(args = {}) {
-  return (dispatch) => { // optionally you can have getState as the second argument
+export function fetchRecommendation(args = {}, weekdays = 7, period, confidence) {
+  // console.log(period, weekdays, confidence);
+  return dispatch => {
+    // optionally you can have getState as the second argument
     dispatch({
       type: HOME_FETCH_RECOMMENDATION_BEGIN,
     });
@@ -21,17 +39,19 @@ export function fetchRecommendation(args = {}) {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
-      const doRequest = args.error ? Promise.reject(new Error()) : Promise.resolve();
+      const doRequest = axios.get('http://10.58.137.250:5050/getdata/', {
+        headers: { FROM: '20160401', TO: '20160630' },
+      });
       doRequest.then(
-        (res) => {
+        res => {
           dispatch({
             type: HOME_FETCH_RECOMMENDATION_SUCCESS,
-            data: res,
+            data: parseData(res.data),
           });
           resolve(res);
         },
         // Use rejectHandler as the second argument so that render errors won't be caught.
-        (err) => {
+        err => {
           dispatch({
             type: HOME_FETCH_RECOMMENDATION_FAILURE,
             data: { error: err },
@@ -69,6 +89,7 @@ export function reducer(state, action) {
         ...state,
         fetchRecommendationPending: false,
         fetchRecommendationError: null,
+        recommendationList: action.data,
       };
 
     case HOME_FETCH_RECOMMENDATION_FAILURE:

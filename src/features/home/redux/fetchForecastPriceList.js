@@ -13,9 +13,7 @@ function parseData(data) {
   return Object.entries(data).map(d => {
     // const date = [d[0].slice(0, 4), d[0].slice(4, 6), d[0].slice(6, 8)].join('-');
     return {
-      date: moment(d[0], dateFormat)
-        .add(1, 'years')
-        .toDate(),
+      date: moment(d[0], dateFormat).toDate(),
       price: +d[1].Price || 0,
       quantity: +d[1].Quantity || 0,
     };
@@ -40,11 +38,11 @@ export function fetchForecastPriceList(args = {}, dataRange = 'all') {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
-      const doRequest = axios.get('http://10.58.137.250:5050/getdata/', {
+      // FROM: '20160401',
+      // TO: '20160731',
+      const doRequest = axios.get('http://10.58.137.250:5050/forecast/', {
         headers: {
-          FROM: '20160401',
-          TO: '20160731',
-          // DATARANGE: dataRange,
+          DATARANGE: dataRange,
         },
       });
       doRequest.then(

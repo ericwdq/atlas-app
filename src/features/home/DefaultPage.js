@@ -17,12 +17,16 @@ import {
   Select,
   DatePicker,
   Tabs,
+  Slider,
+  InputNumber,
+  Checkbox,
 } from 'antd';
 import InteractiveChart from './InteractiveChart';
 const { Header, Content, Footer } = Layout;
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
+const CheckboxGroup = Checkbox.Group;
 const TabPane = Tabs.TabPane;
 const dateFormat = 'YYYY-MM-DD';
 const startDate = '2011-01-01';
@@ -39,10 +43,11 @@ export class DefaultPage extends Component {
     forecasting: false,
     startDate: startDate,
     endDate: endDate,
-    timeSpan: null,
-    strategy: null,
     dataRangeType: 'all',
     recommending: false,
+    weekdays: ['0', '1', '2', '3', '4', '5', '6'],
+    confidence: 1,
+    period: 7,
   };
 
   componentWillMount() {
@@ -114,29 +119,23 @@ export class DefaultPage extends Component {
     this.setState({
       recommending: true,
     });
-    // this.props.actions
-    //   .fetchForecastPriceList(
-    //     {},
-    //     this.state.timeSpan,
-    //     this.state.strategy,
-    //     this.state.startDate,
-    //     this.state.endDate,
-    //   )
-    //   .then(() => {
-    //     this.setState({
-    //       forecasting: false,
-    //     });
-    //   })
-    //   .catch(() => {
-    //     this.setState({
-    //       forecasting: false,
-    //     });
-    //   });
-    setTimeout(() => {
-      this.setState({
-        recommending: false,
+    this.props.actions
+      .fetchRecommendation({}, this.state.weekdays, this.state.period, this.state.confidence)
+      .then(() => {
+        this.setState({
+          recommending: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          recommending: false,
+        });
       });
-    }, 1000);
+    // setTimeout(() => {
+    //   this.setState({
+    //     recommending: false,
+    //   });
+    // }, 1000);
   };
 
   handleDateLink = evt => {
@@ -161,6 +160,26 @@ export class DefaultPage extends Component {
         dataRangeType: 'year',
       });
     }
+  };
+
+  handlePeriodChange = value => {
+    this.setState({
+      period: value,
+    });
+    console.log('checked = ', value);
+  };
+
+  handleWeekdaysChange = checkedValues => {
+    this.setState({
+      weekdays: checkedValues,
+    });
+    console.log('checked = ', checkedValues);
+  };
+
+  handleConfidenceChange = value => {
+    this.setState({
+      confidence: value,
+    });
   };
 
   renderInitializing() {
@@ -213,7 +232,19 @@ export class DefaultPage extends Component {
       purchasePriceList,
       fetchForecastPriceListError,
       forecastPriceList,
+      fetchRecommendationError,
+      recommendationList,
     } = this.props.home;
+    console.log(recommendationList);
+    const weekdaysOptions = [
+      { label: 'Mon', value: '1' },
+      { label: 'Tue', value: '2' },
+      { label: 'Wed', value: '3' },
+      { label: 'Thu', value: '4' },
+      { label: 'Fri', value: '5' },
+      { label: 'Sat', value: '6' },
+      { label: 'Sun', value: '0' },
+    ];
 
     if (fetchPurchasePriceListPending || this.state.initializing) {
       return this.renderInitializing();
@@ -279,7 +310,7 @@ export class DefaultPage extends Component {
                             }
                             onClick={this.handleDateLink}
                           >
-                            All Past
+                            All Past Data
                           </a>
                           <a
                             className={
@@ -287,7 +318,7 @@ export class DefaultPage extends Component {
                             }
                             onClick={this.handleDateLink}
                           >
-                            Last Year
+                            Last Year Data
                           </a>
                         </span>
                       </FormItem>
@@ -363,8 +394,9 @@ export class DefaultPage extends Component {
                     <Form className="ant-advanced-search-form" onSubmit={this.handleRecommend}>
                       <Row gutter={24}>
                         <Col span={10}>
-                          <FormItem label="Purchase Time Span:">
-                            <Select defaultValue="7" onChange={() => {}}>
+                          <FormItem label="Inventory Period:">
+                            <Select defaultValue="7" onChange={this.handlePeriodChange}>
+                              <Option value="1">1 Day</Option>
                               <Option value="7">7 Days</Option>
                               <Option value="15">15 Days</Option>
                               <Option value="30">1 Month</Option>
@@ -373,14 +405,12 @@ export class DefaultPage extends Component {
                           </FormItem>
                         </Col>
                         <Col span={10}>
-                          <FormItem label="Purchase Strategy:">
-                            <Select defaultValue="op1" onChange={() => {}}>
-                              <Option value="op1">Option 1</Option>
-                              <Option value="op2">Option 2</Option>
-                              <Option value="disabled" disabled>
-                                Option 3
-                              </Option>
-                            </Select>
+                          <FormItem label="Purchase Days:">
+                            <CheckboxGroup
+                              options={weekdaysOptions}
+                              defaultValue={['0', '1', '2', '3', '4', '5', '6']}
+                              onChange={this.handleWeekdaysChange}
+                            />
                           </FormItem>
                         </Col>
                         <Col span={4}>
@@ -394,8 +424,56 @@ export class DefaultPage extends Component {
                           </Button>
                         </Col>
                       </Row>
+                      <Row gutter={24}>
+                        <Col>
+                          <FormItem label="Confidence:">
+                            <Row>
+                              <Col span={8}>
+                                <Slider
+                                  min={0}
+                                  max={1}
+                                  onChange={this.handleConfidenceChange}
+                                  value={this.state.confidence}
+                                  step={0.1}
+                                />
+                              </Col>
+                              <Col span={4}>
+                                <InputNumber
+                                  min={0}
+                                  max={1}
+                                  style={{ marginLeft: 16 }}
+                                  step={0.01}
+                                  value={this.state.confidence}
+                                  onChange={this.handleConfidenceChange}
+                                />
+                              </Col>
+                            </Row>
+                          </FormItem>
+                        </Col>
+                      </Row>
                     </Form>
-                    {this.state.recommending && <Spin />}
+                    {fetchRecommendationError && this.renderError(fetchRecommendationError)}
+                    <div className="chart-container recommend">
+                      {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
+                      {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
+                      <br />
+                      <strong>Here are the purchase recommendations for next 3 months: </strong>
+                      <div className="chart-legend">
+                        <span className="line forecast" />
+                        <label>Recommendation Data</label>
+                      </div>
+                      <InteractiveChart
+                        id="recommend-chart"
+                        yAxisText="Quantity (pcs)"
+                        measure="quantity"
+                        unit=""
+                        data={[]}
+                        startDate="2017-04-01"
+                        endDate="2017-06-30"
+                        forecastedData={recommendationList}
+                        forecasting={this.state.recommending}
+                      />
+                    </div>
                   </TabPane>
                 </Tabs>
               </fieldset>

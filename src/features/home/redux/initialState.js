@@ -7,6 +7,7 @@ const initialState = {
   forecastPriceList: [],
   fetchRecommendationPending: false,
   fetchRecommendationError: null,
+  recommendationList: [],
 };
 
 export default initialState;
