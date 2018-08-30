@@ -463,17 +463,7 @@ export class DefaultPage extends Component {
                           <span className="line forecast" />
                           <label>Recommendation Data</label>
                         </div>
-                        <InteractiveChart
-                          id="recommend-chart"
-                          yAxisText="Quantity (pcs)"
-                          measure="recommend"
-                          unit=""
-                          data={[]}
-                          startDate="2017-04-01"
-                          endDate="2017-06-30"
-                          forecastedData={recommendationList}
-                          forecasting={this.state.recommending}
-                        />
+                        <BarChart height={400} title="" data={recommendationList} />
                       </div>
                     )}
                   </TabPane>

@@ -57,9 +57,9 @@ class Bar extends Component {
     const {
       height,
       title,
-      forceFit = false,
+      forceFit = true,
       data,
-      color = 'rgba(24, 144, 255, 0.85)',
+      color = 'rgba(255, 171, 3, 0.85)',
       padding,
     } = this.props;
 
@@ -87,19 +87,13 @@ class Bar extends Component {
         <div ref={this.handleRef}>
           {title && <h4 style={{ marginBottom: 20 }}>{title}</h4>}
           <Chart
-            width={data.length * 30}
             scale={scale}
             height={title ? height - 41 : height}
             forceFit={forceFit}
             data={data}
             padding={padding || 'auto'}
           >
-            <Axis
-              name="x"
-              title={false}
-              label={autoHideXLabels ? false : {}}
-              tickLine={autoHideXLabels ? false : {}}
-            />
+            <Axis name="x" title={false} label={false} tickLine={false} />
             <Axis name="y" min={0} />
             <Tooltip showTitle={false} crosshairs={false} />
             <Geom type="interval" position="x*y" color={color} tooltip={tooltip} />
