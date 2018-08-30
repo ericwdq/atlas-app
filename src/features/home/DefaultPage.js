@@ -310,7 +310,7 @@ export class DefaultPage extends Component {
                 <legend>Intelligent Forecast</legend>
                 <Tabs defaultActiveKey="price">
                   <TabPane tab="Purchase Price Forecast" key="price">
-                    <div className="chart-container">
+                    <div className="chart-container price">
                       {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
                       {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
                       <div className="chart-legend">
@@ -321,6 +321,9 @@ export class DefaultPage extends Component {
                       </div>
                       <InteractiveChart
                         id="price-chart"
+                        text="Price (CNY)"
+                        measure="price"
+                        unit="¥"
                         data={purchasePriceList}
                         startDate={this.state.startDate}
                         endDate={this.state.endDate}
@@ -331,7 +334,7 @@ export class DefaultPage extends Component {
                     </div>
                   </TabPane>
                   <TabPane tab="Sales Quantity Forecast" key="quantity">
-                    <div className="chart-container">
+                    <div className="chart-container quantity">
                       {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
                       {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
                       <div className="chart-legend">
@@ -342,6 +345,9 @@ export class DefaultPage extends Component {
                       </div>
                       <InteractiveChart
                         id="quantity-chart"
+                        text="Quantity"
+                        measure="quantity"
+                        unit=""
                         data={purchasePriceList}
                         startDate={this.state.startDate}
                         endDate={this.state.endDate}

@@ -16,8 +16,8 @@ function parseData(data) {
       date: moment(d[0], dateFormat)
         .add(1, 'years')
         .toDate(),
-      value: +d[1].Price || 0,
-      quantity: d[1].Quantity || 0,
+      price: +d[1].Price || 0,
+      quantity: +d[1].Quantity || 0,
     };
   });
 }

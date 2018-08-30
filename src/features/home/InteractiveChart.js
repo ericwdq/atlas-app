@@ -11,6 +11,10 @@ export class InteractiveChart extends Component {
   static propTypes = {
     home: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
+    id: PropTypes.string.isRequired,
+    text: PropTypes.string,
+    measure: PropTypes.string.isRequired,
+    unit: PropTypes.string,
     data: PropTypes.array.isRequired,
     forecastedData: PropTypes.array,
     startDate: PropTypes.string.isRequired,
@@ -47,16 +51,18 @@ export class InteractiveChart extends Component {
   }
 
   drawLineChart = (data, forecastedData, startDate, endDate) => {
-    const { id } = this.props;
-    d3.select(`#${id}-chart`)
+    const { id, text = 'Value', measure, unit = '' } = this.props;
+
+    d3.select(`#${id}`)
       .selectAll('*')
       .remove();
     const start = moment(startDate, dateformat).toDate();
     const end = moment(endDate, dateformat).toDate();
     data = data.filter(d => {
-      return d.value !== 0 && d.date >= start && d.date <= end;
+      return d[measure] !== 0 && d['date'] >= start && d['date'] <= end;
     });
-    forecastedData = forecastedData.filter(d => d.value !== 0);
+    console.log('data', data);
+    forecastedData = forecastedData.filter(d => d[measure] !== 0);
     let mergedData = [...data];
     if (forecastedData.length > 0) {
       if (data.length > 0) {
@@ -80,11 +86,11 @@ export class InteractiveChart extends Component {
     const width = svgWidth - margin.left - margin.right;
     const height = svgHeight - margin.top - margin.bottom;
 
-    d3.select('div.tooltip').remove();
+    d3.select(`div.tooltip.${measure}`).remove();
     const tooltip = d3
-      .select('.chart-container')
+      .select(`.chart-container.${measure}`)
       .append('div')
-      .attr('class', 'tooltip')
+      .attr('class', 'tooltip ' + measure)
       .style('opacity', 0);
     const dateTxt = tooltip.append('span').attr('class', 'date-txt');
     const valueTxt = tooltip.append('span').attr('class', 'val-txt');
@@ -96,11 +102,14 @@ export class InteractiveChart extends Component {
 
     // const parseDate = d3.time.format('%d-%b-%y').parse;
     const bisectDate = d3.bisector(d => {
-      return d.date;
+      return d['date'];
     }).left;
     const formatValue = d3.format(',.2f');
     const formatCurrency = d => {
-      return '¥ ' + formatValue(d);
+      if (measure === 'quantity') {
+        return d;
+      }
+      return unit + ' ' + formatValue(d);
     };
 
     const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
@@ -112,19 +121,19 @@ export class InteractiveChart extends Component {
     const line = d3
       .line()
       .x(d => {
-        return x(d.date);
+        return x(d['date']);
       })
       .y(d => {
-        return y(d.value);
+        return y(d[measure]);
       });
     x.domain(
       d3.extent(mergedData, d => {
-        return d.date;
+        return d['date'];
       }),
     );
     y.domain(
       d3.extent(mergedData, d => {
-        return d.value;
+        return d[measure];
       }),
     );
 
@@ -136,7 +145,7 @@ export class InteractiveChart extends Component {
     function customXAxis(g) {
       const dataMonths =
         mergedData
-          .map(d => d3.timeFormat('%Y-%m')(d.date))
+          .map(d => d3.timeFormat('%Y-%m')(d['date']))
           .filter((v, i, a) => a.indexOf(v) === i) || [];
       const dateformat = dataMonths.length > 3 ? '%Y-%m' : '%Y-%m-%d';
       const xAxis = d3
@@ -162,12 +171,12 @@ export class InteractiveChart extends Component {
       .call(customYAxis)
       .append('text')
       .attr('fill', 'rgb(102, 102, 102, .85)')
-      .attr('transform', 'translate(22, -26)')
+      .attr('transform', `translate(${measure === 'price' ? '22' : '5'}, -26)`)
       .attr('y', 7)
       .attr('dy', '0.71em')
       .attr('text-anchor', 'end')
       .style('font', '12px sans-serif')
-      .text('Price (CNY)');
+      .text(text);
 
     g.append('path')
       .data([data])
@@ -194,7 +203,7 @@ export class InteractiveChart extends Component {
         .attr('stroke-dasharray', '3 3')
         .attr('stroke-width', 1.5);
 
-      const lastDate = forecastedData[0].date;
+      const lastDate = forecastedData[0]['date'];
       const splitX = x(lastDate) + margin.left;
       splitLine.attr('transform', `translate(0, 20)`).attr('d', `M${splitX},${height} ${splitX} 0`);
     }
@@ -205,7 +214,7 @@ export class InteractiveChart extends Component {
         .tickSize(width)
         .tickFormat(function(d) {
           // var s = formatNumber(d / 1e6);
-          return this.parentNode.nextSibling ? '\xa0' + d : '¥' + d;
+          return this.parentNode.nextSibling ? '\xa0' + d : unit + d;
         });
       g.call(yAxis);
       g.select('.domain').remove();
@@ -261,17 +270,17 @@ export class InteractiveChart extends Component {
         i = bisectDate(mergedData, x0, 1),
         d0 = mergedData[i - 1],
         d1 = mergedData[i],
-        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-      const posX = x(d.date) + margin.left;
-      const posY = y(d.value) + margin.top;
+        d = x0 - d0['date'] > d1['date'] - x0 ? d1 : d0;
+      const posX = x(d['date']) + margin.left;
+      const posY = y(d[measure]) + margin.top;
       markLine.attr('transform', `translate(0, 20)`).attr('d', `M${posX},${height} ${posX} 0`);
 
       dot.attr('transform', `translate(${posX}, ${posY})`);
       const tooltipX = posX + 150 > svgWidth ? posX - 100 : posX + 35;
       const tooltipY = posY + 150 > svgHeight ? posY - 30 : posY + 35;
       tooltip.style('left', `${tooltipX}px`).style('top', `${tooltipY}px`);
-      dateTxt.text(d3.timeFormat('%Y-%m-%d')(d.date));
-      valueTxt.text(formatCurrency(d.value));
+      dateTxt.text(d3.timeFormat('%Y-%m-%d')(d['date']));
+      valueTxt.text(formatCurrency(d[measure]));
     }
   };
 
