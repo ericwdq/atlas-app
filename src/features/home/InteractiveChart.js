@@ -51,7 +51,7 @@ export class InteractiveChart extends Component {
   }
 
   drawLineChart = (data, forecastedData, startDate, endDate) => {
-    const { id, text = 'Value', measure, unit = '' } = this.props;
+    const { id, yAxisText = 'Value', measure, unit = '' } = this.props;
 
     d3.select(`#${id}`)
       .selectAll('*')
@@ -171,12 +171,12 @@ export class InteractiveChart extends Component {
       .call(customYAxis)
       .append('text')
       .attr('fill', 'rgb(102, 102, 102, .85)')
-      .attr('transform', `translate(${measure === 'price' ? '22' : '5'}, -26)`)
+      .attr('transform', `translate(${measure === 'price' ? '22' : '30'}, -26)`)
       .attr('y', 7)
       .attr('dy', '0.71em')
       .attr('text-anchor', 'end')
       .style('font', '12px sans-serif')
-      .text(text);
+      .text(yAxisText);
 
     g.append('path')
       .data([data])

@@ -42,6 +42,7 @@ export class DefaultPage extends Component {
     timeSpan: null,
     strategy: null,
     dataRangeType: 'all',
+    recommending: false,
   };
 
   componentWillMount() {
@@ -88,19 +89,14 @@ export class DefaultPage extends Component {
     );
   };
 
-  handleSubmit = evt => {
+  handleForecast = evt => {
     evt.preventDefault();
     this.setState({
       forecasting: true,
     });
+    const dataRange = this.state.dataRangeType != 'year' ? 'all' : 'year';
     this.props.actions
-      .fetchForecastPriceList(
-        {},
-        this.state.timeSpan,
-        this.state.strategy,
-        this.state.startDate,
-        this.state.endDate,
-      )
+      .fetchForecastPriceList({}, dataRange)
       .then(() => {
         this.setState({
           forecasting: false,
@@ -111,6 +107,36 @@ export class DefaultPage extends Component {
           forecasting: false,
         });
       });
+  };
+
+  handleRecommend = evt => {
+    evt.preventDefault();
+    this.setState({
+      recommending: true,
+    });
+    // this.props.actions
+    //   .fetchForecastPriceList(
+    //     {},
+    //     this.state.timeSpan,
+    //     this.state.strategy,
+    //     this.state.startDate,
+    //     this.state.endDate,
+    //   )
+    //   .then(() => {
+    //     this.setState({
+    //       forecasting: false,
+    //     });
+    //   })
+    //   .catch(() => {
+    //     this.setState({
+    //       forecasting: false,
+    //     });
+    //   });
+    setTimeout(() => {
+      this.setState({
+        recommending: false,
+      });
+    }, 1000);
   };
 
   handleDateLink = evt => {
@@ -212,42 +238,9 @@ export class DefaultPage extends Component {
             >
               <fieldset>
                 <legend>Configuration</legend>
-                <Form className="ant-advanced-search-form" onSubmit={this.handleSubmit}>
+                <Form className="ant-advanced-search-form" onSubmit={this.handleForecast}>
                   <Row gutter={24}>
-                    <Col span={8}>
-                      <FormItem label="Purchase Time Span:">
-                        <Select defaultValue="7" onChange={() => {}}>
-                          <Option value="7">7 Days</Option>
-                          <Option value="15">15 Days</Option>
-                          <Option value="30">1 Month</Option>
-                          <Option value="c">Customize</Option>
-                        </Select>
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <FormItem label="Purchase Strategy:">
-                        <Select defaultValue="op1" onChange={() => {}}>
-                          <Option value="op1">Option 1</Option>
-                          <Option value="op2">Option 2</Option>
-                          <Option value="disabled" disabled>
-                            Option 3
-                          </Option>
-                        </Select>
-                      </FormItem>
-                    </Col>
-                    <Col span={8}>
-                      <Button
-                        size="large"
-                        type="primary"
-                        htmlType="submit"
-                        loading={this.state.forecasting}
-                      >
-                        {this.state.forecasting ? 'Forecast...' : 'Forecast'}
-                      </Button>
-                    </Col>
-                  </Row>
-                  <Row gutter={24}>
-                    <Col span={16}>
+                    <Col span={20}>
                       <FormItem label="Past Data Range:">
                         <RangePicker
                           onChange={this.handleDateChange}
@@ -299,15 +292,24 @@ export class DefaultPage extends Component {
                         </span>
                       </FormItem>
                     </Col>
+                    <Col span={4}>
+                      <Button
+                        size="large"
+                        type="primary"
+                        htmlType="submit"
+                        loading={this.state.forecasting}
+                      >
+                        {this.state.forecasting ? 'Forecast...' : 'Forecast'}
+                      </Button>
+                    </Col>
                   </Row>
-
                   <Row className="form-bottom-buttons-container">
                     <Col span="24" style={{ textAlign: 'right' }} />
                   </Row>
                 </Form>
               </fieldset>
               <fieldset style={{ margin: '10px 0 0 0' }}>
-                <legend>Intelligent Forecast</legend>
+                <legend>Intelligent Forecast and Recommendation</legend>
                 <Tabs defaultActiveKey="price">
                   <TabPane tab="Purchase Price Forecast" key="price">
                     <div className="chart-container price">
@@ -321,7 +323,7 @@ export class DefaultPage extends Component {
                       </div>
                       <InteractiveChart
                         id="price-chart"
-                        text="Price (CNY)"
+                        yAxisText="Price (CNY)"
                         measure="price"
                         unit="¥"
                         data={purchasePriceList}
@@ -345,7 +347,7 @@ export class DefaultPage extends Component {
                       </div>
                       <InteractiveChart
                         id="quantity-chart"
-                        text="Quantity"
+                        yAxisText="Quantity (pcs)"
                         measure="quantity"
                         unit=""
                         data={purchasePriceList}
@@ -357,8 +359,43 @@ export class DefaultPage extends Component {
                       {this.state.forecasting && <Spin />}
                     </div>
                   </TabPane>
-                  <TabPane tab="Purchase Decisions Recommendation" key="planning">
-                    Recommendation content
+                  <TabPane tab="Purchase Decisions Recommendation" key="recommend">
+                    <Form className="ant-advanced-search-form" onSubmit={this.handleRecommend}>
+                      <Row gutter={24}>
+                        <Col span={10}>
+                          <FormItem label="Purchase Time Span:">
+                            <Select defaultValue="7" onChange={() => {}}>
+                              <Option value="7">7 Days</Option>
+                              <Option value="15">15 Days</Option>
+                              <Option value="30">1 Month</Option>
+                              <Option value="c">Customize</Option>
+                            </Select>
+                          </FormItem>
+                        </Col>
+                        <Col span={10}>
+                          <FormItem label="Purchase Strategy:">
+                            <Select defaultValue="op1" onChange={() => {}}>
+                              <Option value="op1">Option 1</Option>
+                              <Option value="op2">Option 2</Option>
+                              <Option value="disabled" disabled>
+                                Option 3
+                              </Option>
+                            </Select>
+                          </FormItem>
+                        </Col>
+                        <Col span={4}>
+                          <Button
+                            size="large"
+                            type="primary"
+                            htmlType="submit"
+                            loading={this.state.recommending}
+                          >
+                            {this.state.recommending ? 'Recommend...' : 'Recommend'}
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Form>
+                    {this.state.recommending && <Spin />}
                   </TabPane>
                 </Tabs>
               </fieldset>

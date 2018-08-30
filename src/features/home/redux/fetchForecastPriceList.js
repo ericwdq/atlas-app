@@ -24,13 +24,8 @@ function parseData(data) {
 
 // Rekit uses redux-thunk for async actions by default: https://github.com/gaearon/redux-thunk
 // If you prefer redux-saga, you can use rekit-plugin-redux-saga: https://github.com/supnate/rekit-plugin-redux-saga
-export function fetchForecastPriceList(
-  args = {},
-  timeSpan = '7',
-  strategy = '1',
-  startDate = '20110101',
-  endDate = '20170331',
-) {
+export function fetchForecastPriceList(args = {}, dataRange = 'all') {
+  console.log('dataRange', dataRange);
   return dispatch => {
     // optionally you can have getState as the second argument
     dispatch({
@@ -46,7 +41,11 @@ export function fetchForecastPriceList(
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
       const doRequest = axios.get('http://10.58.137.250:5050/getdata/', {
-        headers: { FROM: '20160401', TO: '20160731' },
+        headers: {
+          FROM: '20160401',
+          TO: '20160731',
+          // DATARANGE: dataRange,
+        },
       });
       doRequest.then(
         res => {

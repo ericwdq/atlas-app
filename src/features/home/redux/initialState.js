@@ -5,6 +5,8 @@ const initialState = {
   fetchForecastPriceListPending: false,
   fetchForecastPriceListError: null,
   forecastPriceList: [],
+  fetchRecommendationPending: false,
+  fetchRecommendationError: null,
 };
 
 export default initialState;

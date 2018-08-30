@@ -1,17 +1,16 @@
-import axios from 'axios';
 import {
-  DEMO_FETCH_REDDIT_LIST_BEGIN,
-  DEMO_FETCH_REDDIT_LIST_SUCCESS,
-  DEMO_FETCH_REDDIT_LIST_FAILURE,
-  DEMO_FETCH_REDDIT_LIST_DISMISS_ERROR,
+  HOME_FETCH_RECOMMENDATION_BEGIN,
+  HOME_FETCH_RECOMMENDATION_SUCCESS,
+  HOME_FETCH_RECOMMENDATION_FAILURE,
+  HOME_FETCH_RECOMMENDATION_DISMISS_ERROR,
 } from './constants';
 
 // Rekit uses redux-thunk for async actions by default: https://github.com/gaearon/redux-thunk
 // If you prefer redux-saga, you can use rekit-plugin-redux-saga: https://github.com/supnate/rekit-plugin-redux-saga
-export function fetchRedditList(args = {}) {
+export function fetchRecommendation(args = {}) {
   return (dispatch) => { // optionally you can have getState as the second argument
     dispatch({
-      type: DEMO_FETCH_REDDIT_LIST_BEGIN,
+      type: HOME_FETCH_RECOMMENDATION_BEGIN,
     });
 
     // Return a promise so that you could control UI flow without states in the store.
@@ -22,21 +21,19 @@ export function fetchRedditList(args = {}) {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
-      // const doRequest = args.error ? Promise.reject(new Error()) : Promise.resolve();
-      const doRequest = axios.get('http://www.reddit.com/r/reactjs.json');
-
-       doRequest.then(
-        res => {
+      const doRequest = args.error ? Promise.reject(new Error()) : Promise.resolve();
+      doRequest.then(
+        (res) => {
           dispatch({
-            type: DEMO_FETCH_REDDIT_LIST_SUCCESS,
-            data: res.data.data.children.map(child => child.data),
+            type: HOME_FETCH_RECOMMENDATION_SUCCESS,
+            data: res,
           });
           resolve(res);
         },
         // Use rejectHandler as the second argument so that render errors won't be caught.
-        err => {
+        (err) => {
           dispatch({
-            type: DEMO_FETCH_REDDIT_LIST_FAILURE,
+            type: HOME_FETCH_RECOMMENDATION_FAILURE,
             data: { error: err },
           });
           reject(err);
@@ -50,44 +47,43 @@ export function fetchRedditList(args = {}) {
 
 // Async action saves request error by default, this method is used to dismiss the error info.
 // If you don't want errors to be saved in Redux store, just ignore this method.
-export function dismissFetchRedditListError() {
+export function dismissFetchRecommendationError() {
   return {
-    type: DEMO_FETCH_REDDIT_LIST_DISMISS_ERROR,
+    type: HOME_FETCH_RECOMMENDATION_DISMISS_ERROR,
   };
 }
 
 export function reducer(state, action) {
   switch (action.type) {
-    case DEMO_FETCH_REDDIT_LIST_BEGIN:
+    case HOME_FETCH_RECOMMENDATION_BEGIN:
       // Just after a request is sent
       return {
         ...state,
-        fetchRedditListPending: true,
-        fetchRedditListError: null,
+        fetchRecommendationPending: true,
+        fetchRecommendationError: null,
       };
 
-    case DEMO_FETCH_REDDIT_LIST_SUCCESS:
+    case HOME_FETCH_RECOMMENDATION_SUCCESS:
       // The request is success
       return {
         ...state,
-        fetchRedditListPending: false,
-        fetchRedditListError: null,
-        redditList: action.data
+        fetchRecommendationPending: false,
+        fetchRecommendationError: null,
       };
 
-    case DEMO_FETCH_REDDIT_LIST_FAILURE:
+    case HOME_FETCH_RECOMMENDATION_FAILURE:
       // The request is failed
       return {
         ...state,
-        fetchRedditListPending: false,
-        fetchRedditListError: action.data.error,
+        fetchRecommendationPending: false,
+        fetchRecommendationError: action.data.error,
       };
 
-    case DEMO_FETCH_REDDIT_LIST_DISMISS_ERROR:
+    case HOME_FETCH_RECOMMENDATION_DISMISS_ERROR:
       // Dismiss the request failure error
       return {
         ...state,
-        fetchRedditListError: null,
+        fetchRecommendationError: null,
       };
 
     default:
