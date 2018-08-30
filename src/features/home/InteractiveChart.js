@@ -47,7 +47,8 @@ export class InteractiveChart extends Component {
   }
 
   drawLineChart = (data, forecastedData, startDate, endDate) => {
-    d3.select('svg.line-chart')
+    const { id } = this.props;
+    d3.select(`#${id}-chart`)
       .selectAll('*')
       .remove();
     const start = moment(startDate, dateformat).toDate();
@@ -277,7 +278,7 @@ export class InteractiveChart extends Component {
   render() {
     return (
       <svg
-        id="price-chart"
+        id={this.props.id}
         className={this.props.forecasting ? 'line-chart forecasting' : 'line-chart'}
         ref={node => (this.node = node)}
         width={'100%'}

@@ -41,6 +41,7 @@ export class DefaultPage extends Component {
     endDate: endDate,
     timeSpan: null,
     strategy: null,
+    dataRangeType: 'all',
   };
 
   componentWillMount() {
@@ -66,10 +67,14 @@ export class DefaultPage extends Component {
         startDate: dateString[0],
         endDate: dateString[1],
       });
+      this.setState({
+        dataRangeType: 'custom',
+      });
     } else {
       this.setState({
         startDate,
         endDate,
+        dataRangeType: 'all',
       });
     }
   };
@@ -108,6 +113,30 @@ export class DefaultPage extends Component {
       });
   };
 
+  handleDateLink = evt => {
+    // console.log(evt.target);
+    const className = evt.target.className;
+    if (className === this.state.dataRangeType) {
+      evt.preventDefault();
+      return false;
+    }
+
+    this.props.actions.cleanForecastData();
+    if (className.includes('all')) {
+      this.setState({
+        startDate,
+        endDate,
+        dataRangeType: 'all',
+      });
+    } else if (className.includes('year')) {
+      this.setState({
+        startDate: '2016-03-31',
+        endDate: '2017-03-31',
+        dataRangeType: 'year',
+      });
+    }
+  };
+
   renderInitializing() {
     return (
       <div className="home-default-page">
@@ -129,7 +158,7 @@ export class DefaultPage extends Component {
               <Spin />
             </div>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>Atlas team @B1 Hackathon 2018 </Footer>
+          <Footer style={{ textAlign: 'center' }}>Atlas team @The B1 Dev China Hackathon </Footer>
         </Layout>
       </div>
     );
@@ -186,17 +215,17 @@ export class DefaultPage extends Component {
                 <Form className="ant-advanced-search-form" onSubmit={this.handleSubmit}>
                   <Row gutter={24}>
                     <Col span={8}>
-                      <FormItem label="Purchasing Time Span:">
+                      <FormItem label="Purchase Time Span:">
                         <Select defaultValue="7" onChange={() => {}}>
                           <Option value="7">7 Days</Option>
                           <Option value="15">15 Days</Option>
                           <Option value="30">1 Month</Option>
-                          <Option value="c">Customized</Option>
+                          <Option value="c">Customize</Option>
                         </Select>
                       </FormItem>
                     </Col>
                     <Col span={8}>
-                      <FormItem label="Purchasing Strategy:">
+                      <FormItem label="Purchase Strategy:">
                         <Select defaultValue="op1" onChange={() => {}}>
                           <Option value="op1">Option 1</Option>
                           <Option value="op2">Option 2</Option>
@@ -250,6 +279,24 @@ export class DefaultPage extends Component {
                             );
                           }}
                         />
+                        <span className="date-links">
+                          <a
+                            className={
+                              this.state.dataRangeType === 'all' ? 'all link active' : 'all link'
+                            }
+                            onClick={this.handleDateLink}
+                          >
+                            All Past
+                          </a>
+                          <a
+                            className={
+                              this.state.dataRangeType === 'year' ? 'year link active' : 'year link'
+                            }
+                            onClick={this.handleDateLink}
+                          >
+                            Last Year
+                          </a>
+                        </span>
                       </FormItem>
                     </Col>
                   </Row>
@@ -262,7 +309,7 @@ export class DefaultPage extends Component {
               <fieldset style={{ margin: '10px 0 0 0' }}>
                 <legend>Intelligent Forecast</legend>
                 <Tabs defaultActiveKey="price">
-                  <TabPane tab=" Purchasing Price Forecast" key="price">
+                  <TabPane tab="Purchase Price Forecast" key="price">
                     <div className="chart-container">
                       {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
                       {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
@@ -273,6 +320,7 @@ export class DefaultPage extends Component {
                         <label>Forecast Data</label>
                       </div>
                       <InteractiveChart
+                        id="price-chart"
                         data={purchasePriceList}
                         startDate={this.state.startDate}
                         endDate={this.state.endDate}
@@ -282,7 +330,28 @@ export class DefaultPage extends Component {
                       {this.state.forecasting && <Spin />}
                     </div>
                   </TabPane>
-                  <TabPane tab="Purchase Planning Recommendation" key="planning">
+                  <TabPane tab="Sales Quantity Forecast" key="quantity">
+                    <div className="chart-container">
+                      {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
+                      {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
+                      <div className="chart-legend">
+                        <span className="line past" />
+                        <label>Past Data</label>
+                        <span className="line forecast" />
+                        <label>Forecast Data</label>
+                      </div>
+                      <InteractiveChart
+                        id="quantity-chart"
+                        data={purchasePriceList}
+                        startDate={this.state.startDate}
+                        endDate={this.state.endDate}
+                        forecastedData={forecastPriceList}
+                        forecasting={this.state.forecasting}
+                      />
+                      {this.state.forecasting && <Spin />}
+                    </div>
+                  </TabPane>
+                  <TabPane tab="Purchase Decisions Recommendation" key="planning">
                     Recommendation content
                   </TabPane>
                 </Tabs>
