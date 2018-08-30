@@ -12,18 +12,15 @@ const dateFormat = 'YYYYMMDD';
 function parseData(data) {
   return Object.entries(data).map(d => {
     return {
-      date: moment(d[0], dateFormat)
-        .add(1, 'years')
-        .toDate(),
-      price: +d[1].Price || 0,
-      quantity: +d[1].Quantity || 0,
+      date: moment(d[0], dateFormat).toDate(),
+      recommend: +d[1].Recommend || 0,
     };
   });
 }
 
 // Rekit uses redux-thunk for async actions by default: https://github.com/gaearon/redux-thunk
 // If you prefer redux-saga, you can use rekit-plugin-redux-saga: https://github.com/supnate/rekit-plugin-redux-saga
-export function fetchRecommendation(args = {}, weekdays = 7, period, confidence) {
+export function fetchRecommendation(args = {}, weekdays, period, confidence) {
   // console.log(period, weekdays, confidence);
   return dispatch => {
     // optionally you can have getState as the second argument

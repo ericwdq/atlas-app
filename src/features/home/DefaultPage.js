@@ -367,9 +367,9 @@ export class DefaultPage extends Component {
                     </div>
                   </TabPane>
                   <TabPane tab="Sales Quantity Forecast" key="quantity">
+                    {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
+                    {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
                     <div className="chart-container quantity">
-                      {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
-                      {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
                       <div className="chart-legend">
                         <span className="line past" />
                         <label>Past Data</label>
@@ -393,7 +393,7 @@ export class DefaultPage extends Component {
                   <TabPane tab="Purchase Decisions Recommendation" key="recommend">
                     <Form className="ant-advanced-search-form" onSubmit={this.handleRecommend}>
                       <Row gutter={24}>
-                        <Col span={10}>
+                        <Col span={8}>
                           <FormItem label="Inventory Period:">
                             <Select defaultValue="7" onChange={this.handlePeriodChange}>
                               <Option value="1">1 Day</Option>
@@ -404,7 +404,7 @@ export class DefaultPage extends Component {
                             </Select>
                           </FormItem>
                         </Col>
-                        <Col span={10}>
+                        <Col span={12}>
                           <FormItem label="Purchase Days:">
                             <CheckboxGroup
                               options={weekdaysOptions}
@@ -426,9 +426,9 @@ export class DefaultPage extends Component {
                       </Row>
                       <Row gutter={24}>
                         <Col>
-                          <FormItem label="Confidence:">
+                          <FormItem label="Purchase Frequency:">
                             <Row>
-                              <Col span={8}>
+                              <Col span={10}>
                                 <Slider
                                   min={0}
                                   max={1}
@@ -453,27 +453,29 @@ export class DefaultPage extends Component {
                       </Row>
                     </Form>
                     {fetchRecommendationError && this.renderError(fetchRecommendationError)}
-                    <div className="chart-container recommend">
-                      {fetchPurchasePriceListError && this.renderError(fetchPurchasePriceListError)}
-                      {fetchForecastPriceListError && this.renderError(fetchForecastPriceListError)}
-                      <br />
-                      <strong>Here are the purchase recommendations for next 3 months: </strong>
-                      <div className="chart-legend">
-                        <span className="line forecast" />
-                        <label>Recommendation Data</label>
+                    <br />
+                    {recommendationList.length > 0 && (
+                      <div className="chart-container recommend">
+                        <strong>
+                          Here are the purchase decisions recommendation for next 3 months:{' '}
+                        </strong>
+                        <div className="chart-legend">
+                          <span className="line forecast" />
+                          <label>Recommendation Data</label>
+                        </div>
+                        <InteractiveChart
+                          id="recommend-chart"
+                          yAxisText="Quantity (pcs)"
+                          measure="recommend"
+                          unit=""
+                          data={[]}
+                          startDate="2017-04-01"
+                          endDate="2017-06-30"
+                          forecastedData={recommendationList}
+                          forecasting={this.state.recommending}
+                        />
                       </div>
-                      <InteractiveChart
-                        id="recommend-chart"
-                        yAxisText="Quantity (pcs)"
-                        measure="quantity"
-                        unit=""
-                        data={[]}
-                        startDate="2017-04-01"
-                        endDate="2017-06-30"
-                        forecastedData={recommendationList}
-                        forecasting={this.state.recommending}
-                      />
-                    </div>
+                    )}
                   </TabPane>
                 </Tabs>
               </fieldset>
