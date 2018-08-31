@@ -12,7 +12,7 @@ const dateFormat = 'YYYYMMDD';
 function parseData(data) {
   return Object.entries(data).map(d => {
     const date = moment(d[0], dateFormat);
-    const day = date.day();
+    // const day = date.day();
     return {
       x: date.format('MM-DD'),
       y: +d[1].Recommend || 0,
@@ -39,6 +39,7 @@ export function fetchRecommendation(args = {}, period, weekdays, confidence) {
       // doRequest is a placeholder Promise. You should replace it with your own logic.
       // See the real-word example at:  https://github.com/supnate/rekit/blob/master/src/features/home/redux/fetchRedditReactjsList.js
       // args.error here is only for test coverage purpose.
+      // http://10.58.137.250:5050/recommend/ http://localhost:6075/recommend
       const doRequest = axios.get('http://10.58.137.250:5050/recommend/', {
         headers: { PERIOD: period, WEEKDAYS: weekdays.join(','), CONFIDENCE: confidence },
       });

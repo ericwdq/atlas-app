@@ -442,7 +442,7 @@ export class DefaultPage extends Component {
                                   min={0}
                                   max={1}
                                   style={{ marginLeft: 16 }}
-                                  step={0.01}
+                                  step={0.1}
                                   value={this.state.confidence}
                                   onChange={this.handleConfidenceChange}
                                 />
@@ -458,13 +458,39 @@ export class DefaultPage extends Component {
                       <div className="chart-container recommend">
                         <strong>
                           Here are the purchase quantity recommendation of each days for next 3
-                          months:{' '}
+                          months:
                         </strong>
                         <div className="chart-legend">
-                          <span className="line forecast" />
-                          <label>Recommend Data</label>
+                          <span className="line recommend" />
+                          <label>Recommendation Data</label>
                         </div>
-                        <BarChart height={400} title="" data={recommendationList} />
+                        <Row gutter={24}>
+                          <Col span={12}>
+                            {' '}
+                            <BarChart
+                              height={350}
+                              title="Purchase Decisions for April"
+                              data={recommendationList.filter(d => d.x.indexOf('04-') >= 0)}
+                            />
+                          </Col>
+                          <Col span={12}>
+                            <BarChart
+                              height={350}
+                              title="Purchase Decisions for May"
+                              data={recommendationList.filter(d => d.x.indexOf('05-') >= 0)}
+                            />
+                          </Col>
+                        </Row>
+                        <Row gutter={24}>
+                          <Col span={12}>
+                            {' '}
+                            <BarChart
+                              height={350}
+                              title="Purchase Decisions for June"
+                              data={recommendationList.filter(d => d.x.indexOf('06-') >= 0)}
+                            />
+                          </Col>
+                        </Row>
                       </div>
                     )}
                   </TabPane>

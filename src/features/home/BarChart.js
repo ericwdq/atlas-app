@@ -59,7 +59,7 @@ class Bar extends Component {
       title,
       forceFit = true,
       data,
-      color = 'rgba(255, 171, 3, 0.85)',
+      color = 'rgba(47, 194, 91, 0.85)',
       padding,
     } = this.props;
 
@@ -93,7 +93,12 @@ class Bar extends Component {
             data={data}
             padding={padding || 'auto'}
           >
-            <Axis name="x" title={false} label={false} tickLine={autoHideXLabels ? false : {}} />
+            <Axis
+              name="x"
+              title={false}
+              label={autoHideXLabels ? false : {}}
+              tickLine={autoHideXLabels ? false : {}}
+            />
             <Axis name="y" min={0} />
             <Tooltip showTitle={false} crosshairs={false} />
             <Geom type="interval" position="x*y" color={color} tooltip={tooltip} />
