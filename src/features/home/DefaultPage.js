@@ -100,7 +100,7 @@ export class DefaultPage extends Component {
     this.setState({
       forecasting: true,
     });
-    const dataRange = this.state.dataRangeType != 'year' ? 'all' : 'year';
+    const dataRange = this.state.dataRangeType !== 'year' ? 'all' : 'year';
     this.props.actions
       .fetchForecastPriceList({}, dataRange)
       .then(() => {
@@ -236,7 +236,7 @@ export class DefaultPage extends Component {
       fetchRecommendationError,
       recommendationList,
     } = this.props.home;
-    console.log('recommendationList', recommendationList);
+    // console.log('recommendationList', recommendationList);
     const weekdaysOptions = [
       { label: 'Mon', value: '1' },
       { label: 'Tue', value: '2' },
