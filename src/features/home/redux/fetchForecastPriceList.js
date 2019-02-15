@@ -41,7 +41,7 @@ export function fetchForecastPriceList(args = {}, dataRange = 'all') {
       // FROM: '20160401',
       // TO: '20160731',
       // http://10.58.137.250:5050/forecast/ http://localhost:6075/forecast
-      const doRequest = axios.get('http://10.58.137.250:5050/forecast/ ', {
+      const doRequest = axios.get('http://localhost:6075/forecast ', {
         headers: {
           DATARANGE: dataRange,
         },
