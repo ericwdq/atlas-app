@@ -75,5 +75,8 @@ docker exec -it <container id> /bin/bash
 # Enter the container
 $ docker exec -it <container id> /bin/bash
 
+Next step, will try docker compose.😊
 
 🔗 [Dockerizing a Node.js web app](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
+
+
