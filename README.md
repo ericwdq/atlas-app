@@ -21,9 +21,9 @@ eric/node-web-app   latest              d6e01bdfc655        40 minutes ago      
 
 - Run the image
 ```bash
-docker run -p 6075(1):6075(2) -d -it eric/node-web-app
+docker run -p 8888:6075 -d -it eric/node-web-app
 ```
-In the example above, Docker mapped the second 6075(2) port inside of the container to the first 6075(1) port on your machine. so you should access the first 6075(1) port to test. You may use the different ports.
+In the example above, Docker mapped the 6075 port inside of the container to the 8888 port on your machine. so you should access the first 6075(1) port to test. You may use the different ports.
 
 - Get container ID
 ```bash
@@ -36,7 +36,7 @@ docker logs <container id>
 ```
 
 - Test your app
-Access url http://localhost:6075
+Access url http://localhost:8888
 
 - Enter the container, run command inside container
 ```bash
