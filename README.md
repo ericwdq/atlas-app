@@ -71,7 +71,7 @@ Access url http://localhost:8888
 docker exec -it <container id> /bin/bash
 ```
 
-## Next step, will try docker compose.😊
+#### Next step, will try docker compose.😊
 
 🔗 [Dockerizing a Node.js web app](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
 
