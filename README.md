@@ -1,6 +1,6 @@
 # Run app on Docker
 
-- Add Dockerfile content
+- Create Dockerfile file
 ```json
 FROM node:8
 
@@ -26,7 +26,7 @@ EXPOSE 6075
 CMD [ "npm", "start" ]
 ```
 
-- Add dockerignore file
+- Create dockerignore file
 ```json
 node_modules
 npm-debug.log
