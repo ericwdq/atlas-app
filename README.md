@@ -104,7 +104,7 @@ app:
 docker-compose -f ./docker-compose.yml up -d
 ```
 
-**list container and related logs**
+**List container and related logs**
 
 ```bash
 docker ps
@@ -114,7 +114,7 @@ docker ps
 docker logs <container id>
 ```
 
-**execute bash inside docker container**
+**Execute bash inside docker container**
 
 ```bash
 docker exec -it <container id> /bin/bash
