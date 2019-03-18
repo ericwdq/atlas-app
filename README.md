@@ -76,3 +76,58 @@ docker exec -it <container id> /bin/bash
 🔗 [Dockerizing a Node.js web app](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
 
 
+# Docker Compose for NodeJS Web App
+
+**Create** [`docker-compose.yml`](https://github.com/ericwdq/atlas-app/docker-compose.yml "docker-compose.yml")
+
+```yml
+app:
+  build: ./
+  volumes:
+    - ./:/usr/src/app
+  ports:
+    - 8888:6075
+  environment:
+    - NODE_ENV=development
+    - PORT=6075
+  command: "npm start"
+  restart: always
+```
+
+<!--more-->
+
+8888 is the post of host machine，6075 is the port of app inside docker container.
+
+**Build and Run**
+
+```bash
+docker-compose -f ./docker-compose.yml up -d
+```
+
+**list container and related logs**
+
+```bash
+docker ps
+```
+
+```bash
+docker logs <container id>
+```
+
+**execute bash inside docker container**
+
+```bash
+docker exec -it <container id> /bin/bash
+```
+
+**Reference：**
+
+🔗 [A Docker/docker-compose setup with Redis and Node/Express](https://codewithhugo.com/setting-up-express-and-redis-with-docker-compose/)
+
+🔗 [Using Docker Compose for NodeJS Development](https://blog.codeship.com/using-docker-compose-for-nodejs-development/)
+
+🔗 [使用 docker-composer 部署 nodejs 应用](https://www.ddhigh.com/2017/11/01/docker-composer-nodejs.html)
+
+
+
+
