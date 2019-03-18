@@ -71,14 +71,16 @@ Access url http://localhost:8888
 docker exec -it <container id> /bin/bash
 ```
 
+🔗 [Dockerizing a Node.js web app](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
+
+
 #### Next step, will try docker compose. 😊
 
-🔗 [Dockerizing a Node.js web app](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
 
 
 # Docker Compose for NodeJS Web App
 
-**Create** [`docker-compose.yml`](https://github.com/ericwdq/atlas-app/docker-compose.yml "docker-compose.yml")
+- Create [`docker-compose.yml`](https://github.com/ericwdq/atlas-app/docker-compose.yml "docker-compose.yml")
 
 ```yml
 app:
@@ -98,13 +100,13 @@ app:
 
 8888 is the post of host machine，6075 is the port of app inside docker container.
 
-**Build and Run**
+- Build and Run
 
 ```bash
 docker-compose -f ./docker-compose.yml up -d
 ```
 
-**List container and related logs**
+- List container and related logs
 
 ```bash
 docker ps
@@ -114,7 +116,7 @@ docker ps
 docker logs <container id>
 ```
 
-**Execute bash inside docker container**
+- Execute bash inside docker container
 
 ```bash
 docker exec -it <container id> /bin/bash
