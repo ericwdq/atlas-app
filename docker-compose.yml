@@ -1,0 +1,11 @@
+app:
+  build: ./
+  volumes:
+    - ./:/usr/src/app
+  ports:
+    - 8888:6075
+  environment:
+    - NODE_ENV=development
+    - PORT=6075
+  command: 'npm start'
+  restart: always
